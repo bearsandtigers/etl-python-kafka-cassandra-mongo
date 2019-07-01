@@ -1,0 +1,49 @@
+---
+version: '3.7'
+
+services:
+  python-common:
+    build: ./python-common
+    image: python-common
+    restart: "no"
+
+  producer:
+    image: python-common
+    volumes:
+      - "./sources-data:/sources-data:ro"
+    command: tail -f /dev/null
+    restart: always
+    links: 
+      - kafka
+
+  consumer:
+    image: python-common
+    command: tail -f /dev/null
+    restart: always
+    links:
+      - kafka
+      - mongo
+      - cassandra
+
+  kafka:
+    image: spotify/kafka
+    restart: always
+
+  mongo:
+    image: mongo:4
+    restart: always
+    
+  cassandra:
+    image: cassandra
+    restart: always
+    
+  result:
+    image: python-common
+    command: tail -f /dev/null
+    volumes:
+      - ./result:/result
+    restart: always
+    links:
+      - mongo
+      - cassandra
+
